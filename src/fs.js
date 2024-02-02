@@ -1,4 +1,5 @@
 import { firebaseConfig } from "../env.js";
+import { getCurrentPosition } from "./ls.js";
 
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.2/firebase-app.js";
@@ -9,20 +10,19 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore();
 
 window.onClickTestButton = () => {
-  // addData();
+  saveLocation();
   readData();
 }
 
 // DEBUG: Add data
 async function addData() {
   try {
-    const docRef = await addDoc(collection(db, 'user'), {
+    const docRef = await addDoc(collection(db, 'users'), {
       first: "Ada",
       last: "Lovelace",
       born: 1815
     });
     console.log('Doc written with ID: ', docRef.id);
-    readData();
     return true;
   } catch (e) {
     console.error('Adding doc error: ', e);
@@ -43,9 +43,9 @@ async function readData() {
     querySnapshot.forEach((doc) => {
       datas.push({
         id: doc.id,
-        first: doc.data()['first'],
-        last: doc.data()['last'],
-        born: doc.data()['born'],
+        name: doc.data()['name'],
+        lat: doc.data()['lat'],
+        lng: doc.data()['lng'],
       });
     });
     // DEBUG: Display
@@ -53,7 +53,7 @@ async function readData() {
       console.log('no data');
     } else {
       datas.forEach((data, index) => {
-        console.log(`${index}. ${data.id} => ${data.first} ${data.last}(${data.born})`);
+        console.log(`${index}. ${data.id} => ${data.name}: (${data.lat}, ${data.lng})`);
       });  
     }
     return true;
@@ -63,10 +63,23 @@ async function readData() {
   }
 }
 
-window.saveLocation = () => {
-  console.log("save location");
+async function saveLocation() {
+  console.log("--- save location ---");
+  try {
+    const docRef = await addDoc(collection(db, 'users'), {
+      name: document.getElementById('user-name').value,
+      lat: getCurrentPosition().lat,
+      lng: getCurrentPosition().lng
+    });
+    console.log('Doc written with ID: ', docRef.id);
+    return true;
+  } catch (e) {
+    console.error('Adding doc error: ', e);
+    return false;
+  }
+
 }
 
 window.alertButton = () => {
-  alert('ok');
+  alert(`lat:${getCurrentPosition().lat}, lng:${getCurrentPosition().lng}`);
 }

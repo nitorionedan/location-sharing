@@ -16,6 +16,11 @@ let paramLatLng = undefined;
 // 地図マーカーオブジェクト
 let marker = undefined;
 
+// 現在地情報を取得
+export function getCurrentPosition() {
+    return currentLatLng;
+}
+
 // マーカーのメッセージ
 const popupMsg = () => {
     const today = new Date();
